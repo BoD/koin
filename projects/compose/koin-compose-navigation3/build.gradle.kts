@@ -49,6 +49,10 @@ kotlin {
             api(project(":compose:koin-compose"))
             implementation(libs.androidx.navigation3.runtime)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.test.coroutines)
+        }
     }
 }
 

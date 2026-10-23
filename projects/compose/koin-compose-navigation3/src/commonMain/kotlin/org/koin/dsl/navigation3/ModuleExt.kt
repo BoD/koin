@@ -17,6 +17,8 @@ package org.koin.dsl.navigation3
 
 import androidx.compose.runtime.Composable
 import org.koin.compose.navigation3.EntryProviderInstaller
+import org.koin.compose.scope.UnboundKoinScope
+import org.koin.core.annotation.KoinDelicateAPI
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.core.annotation.KoinInternalApi
 import org.koin.core.definition.KoinDefinition
@@ -34,6 +36,9 @@ import org.koin.dsl.ScopeDSL
  * This function registers a composable navigation destination that is scoped to a specific Koin scope,
  * allowing access to scoped dependencies within the composable. The route type [T] is used as both
  * the navigation destination identifier and a qualifier for the entry provider.
+ *
+ * The scope used to resolve this entry's installer is also provided to the composable hierarchy,
+ * so default Compose injection uses the same scope as the [Scope] receiver.
  *
  * Example usage:
  * ```kotlin
@@ -54,7 +59,7 @@ import org.koin.dsl.ScopeDSL
  */
 @KoinExperimentalAPI
 @KoinDslMarker
-@OptIn(KoinInternalApi::class)
+@OptIn(KoinInternalApi::class, KoinDelicateAPI::class)
 inline fun <reified T : Any> ScopeDSL.navigation(
     metadata: Map<String, Any> = emptyMap(),
     noinline definition: @Composable Scope.(T) -> Unit,
@@ -62,7 +67,10 @@ inline fun <reified T : Any> ScopeDSL.navigation(
     val def = _scopedInstanceFactory<EntryProviderInstaller>(named<T>(), {
         val scope = this
         {
-            entry<T>(content = { t -> definition(scope, t) }, metadata = metadata)
+            entry<T>(
+                content = { t -> UnboundKoinScope(scope) { definition(scope, t) } },
+                metadata = metadata,
+            )
         }
     }, scopeQualifier)
     module.indexPrimaryType(def)
@@ -75,6 +83,10 @@ inline fun <reified T : Any> ScopeDSL.navigation(
  * This function registers a composable navigation destination as a singleton in the Koin module,
  * allowing access to module-level dependencies within the composable. The route type [T] is used
  * as both the navigation destination identifier and a qualifier for the entry provider.
+ *
+ * The captured root scope is provided to the composable hierarchy, so default Compose injection
+ * uses the same scope as the [Scope] receiver, even when the entry is displayed within another
+ * Compose Koin scope.
  *
  * Example usage:
  * ```kotlin
@@ -95,7 +107,7 @@ inline fun <reified T : Any> ScopeDSL.navigation(
  */
 @KoinExperimentalAPI
 @KoinDslMarker
-@OptIn(KoinInternalApi::class)
+@OptIn(KoinInternalApi::class, KoinDelicateAPI::class)
 inline fun <reified T : Any> Module.navigation(
     metadata: Map<String, Any> = emptyMap(),
     noinline definition: @Composable Scope.(T) -> Unit,
@@ -103,7 +115,10 @@ inline fun <reified T : Any> Module.navigation(
     val def = _singleInstanceFactory<EntryProviderInstaller>(named<T>(), {
         val scope = this
         {
-            entry<T>(content = { t -> definition(scope, t) }, metadata = metadata)
+            entry<T>(
+                content = { t -> UnboundKoinScope(scope) { definition(scope, t) } },
+                metadata = metadata,
+            )
         }
     })
     indexPrimaryType(def)
