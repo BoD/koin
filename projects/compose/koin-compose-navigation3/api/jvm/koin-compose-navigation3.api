@@ -7,3 +7,16 @@ public final class org/koin/compose/navigation3/KoinNavEntryScopeKt {
 	public static final fun rememberKoinNavEntryScope (Ljava/lang/String;Lorg/koin/core/qualifier/Qualifier;Lorg/koin/core/Koin;Landroidx/lifecycle/ViewModelStoreOwner;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Lorg/koin/core/scope/Scope;
 }
 
+public abstract interface class org/koin/compose/navigation3/NavigationContentKeyFactory {
+	public abstract fun contentKey (Ljava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class org/koin/compose/navigation3/NavigationMetadataProvider {
+	public abstract fun getMetadata ()Ljava/util/Map;
+}
+
+public abstract interface annotation class org/koin/compose/navigation3/annotation/NavigationEntry : java/lang/annotation/Annotation {
+	public abstract fun contentKeyFactory ()Ljava/lang/Class;
+	public abstract fun metadataProvider ()Ljava/lang/Class;
+}
+

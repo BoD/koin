@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.androidx.navigation3.runtime)
         }
         commonTest.dependencies {
+            implementation(project(":core:koin-annotations"))
             implementation(libs.kotlin.test)
             implementation(libs.test.coroutines)
         }
