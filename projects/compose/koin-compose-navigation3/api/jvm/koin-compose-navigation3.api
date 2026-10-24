@@ -2,3 +2,8 @@ public final class org/koin/compose/navigation3/EntryProviderKt {
 	public static final fun koinEntryProvider (Lorg/koin/core/scope/Scope;Landroidx/compose/runtime/Composer;II)Lkotlin/jvm/functions/Function1;
 }
 
+public final class org/koin/compose/navigation3/KoinNavEntryScopeKt {
+	public static final fun KoinNavEntryScope (Ljava/lang/String;Lorg/koin/core/qualifier/Qualifier;Lorg/koin/core/Koin;Landroidx/lifecycle/ViewModelStoreOwner;Lkotlin/jvm/functions/Function0;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+	public static final fun rememberKoinNavEntryScope (Ljava/lang/String;Lorg/koin/core/qualifier/Qualifier;Lorg/koin/core/Koin;Landroidx/lifecycle/ViewModelStoreOwner;Lkotlin/jvm/functions/Function0;Landroidx/compose/runtime/Composer;II)Lorg/koin/core/scope/Scope;
+}
+

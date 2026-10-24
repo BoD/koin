@@ -47,6 +47,7 @@ kotlin {
         }
         commonMain.dependencies {
             api(project(":compose:koin-compose"))
+            api(libs.jb.composeViewmodel)
             implementation(libs.androidx.navigation3.runtime)
         }
         commonTest.dependencies {
