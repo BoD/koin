@@ -78,6 +78,42 @@ inline fun <reified T : Any> ScopeDSL.navigation(
 }
 
 /**
+ * Declares a scoped navigation entry with a custom Navigation 3 content-key factory.
+ *
+ * [clazzContentKey] receives the route instance and returns the entry's stable content identity.
+ * The returned value is passed to Navigation 3 unchanged and must meet its state-saving
+ * requirements. It does not select or create a Koin scope.
+ *
+ * The overload without [clazzContentKey] retains Navigation 3's own default key behaviour.
+ * Both overloads provide the captured scope to destination content without owning its lifetime.
+ *
+ * @param metadata Metadata passed to the navigation entry
+ * @param clazzContentKey Factory for the entry's content identity, as in Navigation 3's `entry`
+ * @param definition Destination content receiving the captured scope and route instance
+ */
+@KoinExperimentalAPI
+@KoinDslMarker
+@OptIn(KoinInternalApi::class, KoinDelicateAPI::class)
+inline fun <reified T : Any> ScopeDSL.navigation(
+    metadata: Map<String, Any> = emptyMap(),
+    noinline clazzContentKey: (T) -> Any,
+    noinline definition: @Composable Scope.(T) -> Unit,
+): KoinDefinition<EntryProviderInstaller> {
+    val def = _scopedInstanceFactory<EntryProviderInstaller>(named<T>(), {
+        val scope = this
+        {
+            entry<T>(
+                clazzContentKey = clazzContentKey,
+                content = { t -> UnboundKoinScope(scope) { definition(scope, t) } },
+                metadata = metadata,
+            )
+        }
+    }, scopeQualifier)
+    module.indexPrimaryType(def)
+    return KoinDefinition(module, def)
+}
+
+/**
  * Declares a singleton navigation entry within a Koin module.
  *
  * This function registers a composable navigation destination as a singleton in the Koin module,
@@ -116,6 +152,42 @@ inline fun <reified T : Any> Module.navigation(
         val scope = this
         {
             entry<T>(
+                content = { t -> UnboundKoinScope(scope) { definition(scope, t) } },
+                metadata = metadata,
+            )
+        }
+    })
+    indexPrimaryType(def)
+    return KoinDefinition(this, def)
+}
+
+/**
+ * Declares a module-level navigation entry with a custom Navigation 3 content-key factory.
+ *
+ * [clazzContentKey] receives the route instance and returns the entry's stable content identity.
+ * The returned value is passed to Navigation 3 unchanged and must meet its state-saving
+ * requirements. It does not select or create a Koin scope.
+ *
+ * The overload without [clazzContentKey] retains Navigation 3's own default key behaviour.
+ * Both overloads provide the captured scope to destination content without owning its lifetime.
+ *
+ * @param metadata Metadata passed to the navigation entry
+ * @param clazzContentKey Factory for the entry's content identity, as in Navigation 3's `entry`
+ * @param definition Destination content receiving the captured scope and route instance
+ */
+@KoinExperimentalAPI
+@KoinDslMarker
+@OptIn(KoinInternalApi::class, KoinDelicateAPI::class)
+inline fun <reified T : Any> Module.navigation(
+    metadata: Map<String, Any> = emptyMap(),
+    noinline clazzContentKey: (T) -> Any,
+    noinline definition: @Composable Scope.(T) -> Unit,
+): KoinDefinition<EntryProviderInstaller> {
+    val def = _singleInstanceFactory<EntryProviderInstaller>(named<T>(), {
+        val scope = this
+        {
+            entry<T>(
+                clazzContentKey = clazzContentKey,
                 content = { t -> UnboundKoinScope(scope) { definition(scope, t) } },
                 metadata = metadata,
             )
